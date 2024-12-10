@@ -1,17 +1,16 @@
 import type { BaseEditor } from "slate";
-import type { ReactEditor } from "slate-react";
 import type { HistoryEditor } from "slate-history";
+import type { ReactEditor } from "slate-react";
 
-export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-export type ParagraphElement = {
-	type: "paragraph";
+export type CustomElement = {
+	type: "paragraph" | "heading";
+	level?: HeadingLevel;
 	children: CustomText[];
 };
 
-export type CustomElement = ParagraphElement;
-
-export type FormattedText = {
+export type CustomText = {
 	text: string;
 	bold?: boolean;
 	italic?: boolean;
@@ -19,7 +18,7 @@ export type FormattedText = {
 	strikethrough?: boolean;
 };
 
-export type CustomText = FormattedText;
+export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
 declare module "slate" {
 	interface CustomTypes {
