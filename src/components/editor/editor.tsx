@@ -3,7 +3,14 @@
 import { Card } from "@/components/ui/card";
 import isHotkey from "is-hotkey";
 import { type KeyboardEvent, useCallback, useMemo, useState } from "react";
-import { type Descendant, createEditor } from "slate";
+import {
+	type Descendant,
+	Editor,
+	Element,
+	Point,
+	Transforms,
+	createEditor,
+} from "slate";
 import { withHistory } from "slate-history";
 import {
 	Editable,
@@ -16,6 +23,7 @@ import { CodePreview } from "./code-preview";
 import { toggleBlock, toggleMark } from "./editorUtils";
 import { LivePreview } from "./live-preview";
 import { Toolbar } from "./toolbar";
+import type { CustomEditor, CustomElement } from "./types";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -80,7 +88,10 @@ const initialValue: Descendant[] = [
 ];
 
 export const TextEditor = () => {
-	const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+	const editor = useMemo(
+		() => withEnterBreakOut(withHistory(withReact(createEditor()))),
+		[],
+	);
 	const [refreshKey, setRefreshKey] = useState(0);
 
 	const handleChange = useCallback((value: Descendant[]) => {
@@ -168,4 +179,32 @@ export const TextEditor = () => {
 			</div>
 		</div>
 	);
+};
+
+const withEnterBreakOut = (editor: CustomEditor) => {
+	const { insertBreak } = editor;
+
+	editor.insertBreak = () => {
+		const [match] = Editor.nodes(editor, {
+			match: (n) => Element.isElement(n) && n.type === "heading",
+		});
+
+		if (match) {
+			const [node, path] = match;
+			const end = Editor.end(editor, path);
+			const selection = editor.selection;
+
+			if (selection && Point.equals(selection.focus, end)) {
+				Transforms.insertNodes(editor, {
+					type: "paragraph",
+					children: [{ text: "" }],
+				} as CustomElement);
+				return;
+			}
+		}
+
+		insertBreak();
+	};
+
+	return editor;
 };
