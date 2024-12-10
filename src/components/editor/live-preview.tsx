@@ -1,3 +1,4 @@
+// src/components/editor/live-preview.tsx
 "use client";
 
 import { Card } from "@/components/ui/card";
@@ -25,8 +26,8 @@ export const LivePreview = ({ value }: LivePreviewProps) => {
                 body {
                   font-family: system-ui, -apple-system, sans-serif;
                   line-height: 1.5;
-                  padding: 1rem;
                   margin: 0;
+                  padding: 1rem;
                 }
                 * { max-width: 100%; }
               </style>
@@ -35,19 +36,33 @@ export const LivePreview = ({ value }: LivePreviewProps) => {
           </html>
         `);
 				doc.close();
+
+				// Ajustar altura del iframe al contenido
+				const resizeObserver = new ResizeObserver(() => {
+					if (iframeRef.current && doc.body) {
+						iframeRef.current.style.height = `${doc.body.scrollHeight}px`;
+					}
+				});
+
+				resizeObserver.observe(doc.body);
+
+				return () => {
+					resizeObserver.disconnect();
+				};
 			}
 		}
 	}, [html]);
 
 	return (
-		<Card className="h-full">
+		<Card>
 			<div className="p-2 bg-muted text-sm font-medium border-b">
 				Live Preview
 			</div>
 			<iframe
 				ref={iframeRef}
-				className="w-full h-[calc(100%-37px)] bg-white"
+				className="w-full bg-white"
 				title="Preview"
+				scrolling="no"
 			/>
 		</Card>
 	);
