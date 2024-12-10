@@ -26,10 +26,9 @@ import type { CustomEditor } from "./types";
 
 interface ToolbarProps {
 	editor: CustomEditor;
-	onRefresh: () => void;
 }
 
-export const Toolbar = ({ editor, onRefresh }: ToolbarProps) => {
+export const Toolbar = ({ editor }: ToolbarProps) => {
 	const formatButtons = [
 		{ format: "bold", icon: Bold, shortcut: "⌘+B" },
 		{ format: "italic", icon: Italic, shortcut: "⌘+I" },
@@ -89,22 +88,6 @@ export const Toolbar = ({ editor, onRefresh }: ToolbarProps) => {
 				))}
 
 				<Separator orientation="vertical" className="mx-2 h-8" />
-
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={onRefresh}
-							className="w-8 h-8"
-						>
-							<RefreshCw className="h-4 w-4" />
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent>
-						<p>Refresh Preview</p>
-					</TooltipContent>
-				</Tooltip>
 			</div>
 		</TooltipProvider>
 	);

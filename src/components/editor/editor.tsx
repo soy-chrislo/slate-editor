@@ -17,7 +17,6 @@ import { toggleBlock, toggleMark } from "./editorUtils";
 import { LivePreview } from "./live-preview";
 import { Toolbar } from "./toolbar";
 
-type MarkFormat = "bold" | "italic" | "underline" | "strikethrough";
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 const HOTKEYS = {
@@ -84,13 +83,12 @@ export const TextEditor = () => {
 	const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 	const [refreshKey, setRefreshKey] = useState(0);
 
-	const handleRefresh = useCallback(() => {
+	const handleChange = useCallback((value: Descendant[]) => {
 		setRefreshKey((prev) => prev + 1);
 	}, []);
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent<HTMLDivElement>) => {
-			// Type-safe way to get hotkey entries
 			const entries = Object.entries(HOTKEYS) as [
 				keyof typeof HOTKEYS,
 				(typeof HOTKEYS)[keyof typeof HOTKEYS],
@@ -145,8 +143,12 @@ export const TextEditor = () => {
 			<div className="grid grid-cols-2 gap-4">
 				<div className="space-y-4">
 					<Card>
-						<Slate editor={editor} initialValue={initialValue}>
-							<Toolbar editor={editor} onRefresh={handleRefresh} />
+						<Slate
+							editor={editor}
+							initialValue={initialValue}
+							onChange={handleChange}
+						>
+							<Toolbar editor={editor} />
 							<div className="p-4">
 								<Editable
 									className="min-h-[400px] outline-none prose prose-sm max-w-none"
